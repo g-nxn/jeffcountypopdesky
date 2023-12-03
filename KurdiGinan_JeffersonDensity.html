@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- #1 Set the title of your web page here -->
+    <title>Jefferson County, KY Population Density</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />
+
+    <!-- Reference the Leaflet CSS style sheet here -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
+
+    <!-- Reference the Leaflet Javascript library here. -->
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
+
+    <!-- Set the CSS style for the html/body and the map itself. You can change the dimensions of the map below -->
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+        #map {
+            width: 1000px;
+            height: 800px;
+        }
+    </style>
+
+
+</head>
+<body>
+
+    <!-- This div tag will contain the map that is generated in the script below. -->
+    <div id='map'></div>
+
+    <!-- #2 Add the script that declares the tractData variable containing the GeoJSON data on the line below. -->
+    <script src="jefftracts.js" type="text/javascript"></script>
+
+    <!-- The script below defines the Leaflet map -->
+    <script>
+
+        // #3 Here we declare a variable called 'map' for the div tag above. Set the initial location to Jefferson County, KY and the appropriate zoom level of your map here. Format: setView([lat, long], zoom)
+        var map = L.map('map').setView([38.209237, -85.7038502], 11);
+
+        // Adding a basemap from Mapbox
+        L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+            maxZoom: 18,
+            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, ' +
+                '<a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, ' +
+                'Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+            //#4 You could experiment with the basemap below. Try 'mapbox.streets' or 'mapbox.dark' for example.
+            id: 'mapbox.outdoors'
+        }).addTo(map);
+
+        // #5 Function to get color based on population density
+        function getColor(v) {
+            return v > 7184.33 ? '#800026' :
+                v > 4935.72 ? '#BD0026' :
+                v > 3311.67 ? '#E31A1C' :
+                v > 1721.32 ? '#FC4E2A' :
+                v > 114.10 ? '#FD8D3C' :
+                '#FEB24C';
+        }
+
+        // #6 Function to set style properties
+        function style(feature) {
+            return {
+                fillColor: getColor(feature.properties.PDENSITY),
+                weight: 2,
+                opacity: 1,
+                color: 'white',
+                dashArray: '3',
+                fillOpacity: 0.7
+            };
+        }
+
+        // Declaring the variable 'layer' to contain the GeoJSON data and configuring the layer style and pop-ups
+        var layer = L.geoJSON(tractData, {
+            style: style, // #7 Applying style to the GeoJSON data
+            onEachFeature: function (feature, layer) { // #8 Configuring pop-ups
+                layer.bindPopup('<h3>Tract ID: ' + feature.properties.GEO_ID + '</h3><p>Population Density (per sq mi): ' + (feature.properties.PDENSITY) + '</p>');
+            }
+        }).addTo(map);
+
+    </script>
+
+</body>
+</html>
